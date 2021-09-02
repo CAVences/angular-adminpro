@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
+//@ts-ignore
+declare function customInitFunctions();
 
 @Component({
   selector: 'app-login',
@@ -7,9 +11,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginComponent implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
+
+  login() {
+    this.router.navigateByUrl('/');
+  }
 
   ngOnInit(): void {
+    customInitFunctions();
   }
 
 }
