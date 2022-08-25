@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, NgZone, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsuariosService } from 'src/app/services/usuarios.service';
 import Swal from 'sweetalert2'
@@ -15,7 +15,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   @ViewChild('googleBtn') googleBtn?: ElementRef;
 
-  public loginForm = this.fb.group({
+  public loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
     remember: [false]
