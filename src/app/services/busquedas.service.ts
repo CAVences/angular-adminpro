@@ -31,6 +31,14 @@ export class BusquedasService {
     )
   }
 
+  private transformarHospitales(resultados: any[]) {
+    return resultados
+  }
+
+  private transformarMedicos(resultados: any[]) {
+    return resultados
+  }
+
   buscar(tipo: 'usuarios' | 'medicos' | 'hospitales', termino: string) {
     const url = `${base_url}/busqueda/coleccion/${tipo}/${termino}`;
     return this.http.get<any[]>(url, this.headers)
@@ -39,6 +47,10 @@ export class BusquedasService {
           switch (tipo) {
             case 'usuarios':
               return this.transformarUsuarios(response.resultados);
+            case 'hospitales':
+              return this.transformarHospitales(response.resultados);
+            case 'medicos':
+            return this.transformarMedicos(response.resultados);
             default:
               return [];
           }
