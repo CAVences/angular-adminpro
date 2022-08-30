@@ -33,12 +33,29 @@ export class UsuariosService {
     return this.usuario?.uid || '';
   }
 
+  get role(): 'ADMIN_ROLE' | 'USER_ROLE' {
+    return this.usuario?.role!;
+  }
+
+  get correo(): string {
+    return this.usuario?.email!;
+  }
+
+  get google(): boolean {
+    return this.usuario?.google!;
+  }
+
   get headers() {
     return {
       headers: {
         'x-token': this.token
       }
     }
+  }
+
+  guardarLocalStorage( token: string, menu: any) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('menu', JSON.stringify(menu));
   }
 
 
@@ -49,7 +66,7 @@ export class UsuariosService {
         map((response: any) => {
           const { email, google, nombre, role, img = '', uid } = response.usuario;
           this.usuario = new Usuario(nombre, email, '', role, google, img, uid)
-          localStorage.setItem('token', response.token)
+          this.guardarLocalStorage(response.token, response.menu)
           return true;
         }),
         catchError(error => of(false))
@@ -57,7 +74,12 @@ export class UsuariosService {
   }
 
   cearUsuario(formData: RegisterForm) {
-    return this.http.post(`${base_url}/usuarios`, formData);
+    return this.http.post(`${base_url}/usuarios`, formData)
+            .pipe(
+              tap( (response: any) => {
+                this.guardarLocalStorage(response.token, response.menu)
+              })
+            )
   }
 
 
@@ -98,8 +120,7 @@ export class UsuariosService {
     return this.http.post(`${base_url}/login`, formData)
       .pipe(
         tap((response: any) => {
-          console.log(response);
-          localStorage.setItem('token', response.token)
+          this.guardarLocalStorage(response.token, response.menu)
         })
       )
   }
@@ -110,19 +131,25 @@ export class UsuariosService {
     return this.http.post(`${base_url}/login/google`, { token })
       .pipe(
         tap((response: any) => {
-          console.log(response);
-          localStorage.setItem('token', response.token)
+          this.guardarLocalStorage(response.token, response.menu)
         })
       )
   }
 
   logout() {
     localStorage.removeItem('token');
-    google.accounts.id.revoke('adan.vences@gmail.com', () => {
-      this.ngZone.run(() => {
-        this.router.navigateByUrl('/login')
+    localStorage.removeItem('menu');
+
+    if(this.google) {
+      google.accounts.id.revoke(this.correo, () => {
+        this.ngZone.run(() => {
+          this.router.navigateByUrl('/login')
+        })
       })
-    })
+    } else {
+      this.router.navigateByUrl('/login')
+    }
+    
   }
 
 
